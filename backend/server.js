@@ -14,6 +14,9 @@ const PORT = process.env.PORT || 5000; // Set the port to either the environment
 app.use(express.json()); // Middleware to parse JSON bodies
 app.use(cors()); // Middleware to enable CORS, allowing cross-origin requests
 
+const authRoutes = require('./routes/auth');
+app.use('/api/auth', authRoutes);
+
 // Middleware is used to parse JSON in incoming requests, so you dont have to manually parse through data.
 
 //Test route
@@ -35,3 +38,5 @@ mongoose.connect(process.env.MONGO_URI, {
 })
 .then(() => console.log('Connected to MongoDB'))
 .catch(err => console.error('MongoDB connection failed:', err));
+
+
