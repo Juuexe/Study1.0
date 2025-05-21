@@ -17,6 +17,11 @@ app.use(cors()); // Middleware to enable CORS, allowing cross-origin requests
 const authRoutes = require('./routes/auth');
 app.use('/api/auth', authRoutes);
 
+const roomRoutes = require('./routes/room');
+app.use('/api/rooms', roomRoutes);
+
+
+
 // Middleware is used to parse JSON in incoming requests, so you dont have to manually parse through data.
 
 //Test route
