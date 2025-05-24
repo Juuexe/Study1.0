@@ -112,6 +112,74 @@ router.post('/:roomId/message', authenticateToken, async (req, res) => {
     }
 });
 
+// @route   GET /api/rooms/:roomId/messages
+// @desc    Get all messages from a room
+// @access  Private
+router.get('/:roomId/messages', authenticateToken, async (req, res) => {
+    try {
+        const { roomId } = req.params;
+
+        // Find room and populate sender usernames
+        const room = await Room.findById(roomId) // Finds the room document by its ID
+            .populate('messages.sender', 'username email') // only include these fields
+           
+        if (!room) {
+            return res.status(404).json({ message: 'Room not found' });
+        }
+
+        // Check if user is a participant
+        if (!room.participants.includes(req.user.id)) {
+            return res.status(403).json({ message: 'You must join the room first' });
+        }
+
+        res.status(200).json(room.messages); // Send just the array of messages
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// @route   DELETE /api/rooms/:roomId/messages/:messageId
+// @desc    Delete a message from a room (only if sender matches)
+// @access  Private
+router.delete('/:roomId/messages/:messageId', authenticateToken, async (req, res) => {
+    try {
+       let { roomId, messageId } = req.params;
+
+// Just in case, remove quotes if they exist
+roomId = roomId.replace(/['"]+/g, '');
+messageId = messageId.replace(/['"]+/g, '');
+
+console.log("Cleaned Room ID:", roomId);
+console.log("Cleaned Message ID:", messageId);
+
+
+        const room = await Room.findById(roomId);
+        if (!room) return res.status(404).json({ message: 'Room not found' });
+
+        // Find the message
+        const messageIndex = room.messages.findIndex(msg => msg._id.toString() === messageId);
+        if (messageIndex === -1) {
+            return res.status(404).json({ message: 'Message not found' });
+        }
+
+        // Check if the current user is the sender
+        const message = room.messages[messageIndex];
+        if (message.sender.toString() !== req.user.id) {
+            return res.status(403).json({ message: 'You can only delete your own messages' });
+        }
+
+        // Remove message
+        room.messages.splice(messageIndex, 1);
+        await room.save();
+
+        res.status(200).json({ message: 'Message deleted' });
+   } catch (err) {
+    console.error("DELETE error:", err.message);
+    res.status(500).json({ message: 'Server error', error: err.message });
+}
+});
+
 
 
 
