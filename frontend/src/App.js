@@ -1,11 +1,12 @@
+import Authform from './Authform'; // Importing the AuthForm component from Authform.js
+
 function App() {
   return (
     <div>
       <h1>Study Group App</h1>
-      <p>Welcome! Let's build something awesome.</p>
+      <Authform />
     </div>
   );
 }
 
 export default App;
-
