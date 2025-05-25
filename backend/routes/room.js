@@ -139,6 +139,16 @@ router.get('/:roomId/messages', authenticateToken, async (req, res) => {
     }
 });
 
+router.get('/', authenticateToken, async (req, res) => {
+  try {
+    const rooms = await Room.find();
+    res.json(rooms);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 // @route   DELETE /api/rooms/:roomId/messages/:messageId
 // @desc    Delete a message from a room (only if sender matches)
 // @access  Private
