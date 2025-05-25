@@ -46,9 +46,14 @@ function Authform() {                        //declare a functional component - 
     }
   };
 
+// Renders h2 heading that displays "Login" or "Register" based on current mode.
+//  <br />  Inserts a line break element for spacing.  
+// <p style={{ color: 'green' }}>{message}</p> Paragraph element with green text color that displays the message state variable.
+//
+
   return (
     <div>
-      <h2>{isLogin ? 'Login' : 'Register'}</h2>         // Renders h2 heading that displays "Login" or "Register" based on current mode.
+      <h2>{isLogin ? 'Login' : 'Register'}</h2>         
       <form onSubmit={handleSubmit}>
         {!isLogin && (
           <input
@@ -59,13 +64,13 @@ function Authform() {                        //declare a functional component - 
             onChange={handleChange}
           />
         )}
-        <br />             // Inserts a line break element to add space between form fields.
+        <br />            
         <input
           type="email"
           name="email"
           placeholder="Email"
           value={form.email}
-          onChange={handleChange}  // Sets onChange event handler to update state when user types.
+          onChange={handleChange}  
         />
         <br />
         <input
@@ -79,9 +84,9 @@ function Authform() {                        //declare a functional component - 
         <button type="submit">{isLogin ? 'Login' : 'Register'}</button>
       </form>
 
-      <p style={{ color: 'green' }}>{message}</p>     // Paragraph element with green text color that displays the message state variable.
+      <p style={{ color: 'green' }}>{message}</p>     
 
-      <button onClick={() => setIsLogin(!isLogin)}>       // Button to toggle between login and register modes.
+      <button onClick={() => setIsLogin(!isLogin)}>       
         Switch to {isLogin ? 'Register' : 'Login'}
       </button>
     </div>

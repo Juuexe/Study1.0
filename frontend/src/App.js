@@ -1,10 +1,19 @@
-import Authform from './Authform'; // Importing the AuthForm component from Authform.js
+import { useState, useEffect } from 'react';
+import AuthForm from './Authform';
+import RoomList from './RoomList';
 
 function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    setIsLoggedIn(!!token);
+  }, []);
+
   return (
     <div>
       <h1>Study Group App</h1>
-      <Authform />
+      {isLoggedIn ? <RoomList /> : <AuthForm />}
     </div>
   );
 }
