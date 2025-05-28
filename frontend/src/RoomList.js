@@ -29,19 +29,22 @@ function RoomList() {
     fetchRooms();
   }, []);
 
-  return (
-    <div>
-      <h2>Available Study Rooms</h2>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      <ul>
-        {rooms.map((room) => (
-          <li key={room._id}>
-            Room ID: <strong>{room._id}</strong>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
+ return (
+  <div>
+    <h2>Available Study Rooms</h2>
+    {error && <p style={{ color: 'red' }}>{error}</p>}
+    <ul>
+      {rooms.map((room) => (
+        <li key={room._id}>
+          <h3>{room.name}</h3>
+          <p>{room.description}</p>
+          <small>Room ID: {room._id}</small>
+        </li>
+      ))}
+    </ul>
+  </div>
+);
+
 }
 
 export default RoomList;
