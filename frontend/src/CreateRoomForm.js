@@ -1,3 +1,4 @@
+// src/CreateRoomForm.js
 import { useState } from 'react';
 
 function CreateRoomForm({ token, onRoomCreated }) {
@@ -5,37 +6,39 @@ function CreateRoomForm({ token, onRoomCreated }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
-      const res = await fetch('https://study1-0.onrender.com/api/rooms', {
+      const response = await fetch('https://study1-0.onrender.com/api/rooms', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ name: roomName })
+        body: JSON.stringify({ name: roomName }),
       });
 
-      const data = await res.json();
-      if (res.ok) {
-        alert('Room created!');
+      const data = await response.json();
+
+      if (response.ok) {
         setRoomName('');
-        onRoomCreated && onRoomCreated(data); // Optional callback
+        onRoomCreated(); // Trigger a refresh
       } else {
-        alert(data.message || 'Error creating room');
+        console.error(data.message);
+        alert(data.message || 'Failed to create room');
       }
     } catch (err) {
-      console.error('Room creation failed:', err);
+      console.error(err);
+      alert('Error connecting to server');
     }
   };
 
   return (
     <form onSubmit={handleSubmit}>
-      <h3>Create a New Room</h3>
       <input
         type="text"
-        placeholder="Room name"
         value={roomName}
         onChange={(e) => setRoomName(e.target.value)}
+        placeholder="Enter room name"
         required
       />
       <button type="submit">Create Room</button>
