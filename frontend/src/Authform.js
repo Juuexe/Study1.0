@@ -1,7 +1,7 @@
 import { useState } from 'react'; //; lets you add state variables to functional components
 
 
-function Authform() {                        //declare a functional component - AuthForm
+function Authform({ onLogin }) {                        //declare a functional component - AuthForm
   const [isLogin, setIsLogin] = useState(true); // creates a a state variable isLogin, with initial value true, and a function setIsLogin to update it
   const [form, setForm] = useState({ username: '', email: '', password: '' }); // creates a state variable form, initialized with empty strings for username, email, and password, updating it with setForm
   const [message, setMessage] = useState(''); // creates a state variable message, initialized as an empty string, and a function setMessage to update it
@@ -37,6 +37,7 @@ function Authform() {                        //declare a functional component - 
       if (isLogin) {
         localStorage.setItem('token', data.token);
         setMessage('Logged in! ');
+        onLogin();
       } else {
         setMessage('Registered! Now switch to login.');
       }
