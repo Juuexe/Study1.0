@@ -23,6 +23,11 @@ const RoomSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId, // Users in the room
         ref: 'User'
     }],
+    creator: {
+        type: mongoose.Schema.Types.ObjectId, // User who created the room
+        ref: 'User',
+        required: true
+    },
     messages: [MessageSchema] // Chat messages in the room
 }, { timestamps: true }); // Automatically adds createdAt, updatedAt fields
 

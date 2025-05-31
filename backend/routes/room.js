@@ -20,7 +20,8 @@ router.post('/create', authenticateToken, async (req, res) => {
         const newRoom = new Room({
             name,
             description,
-            participants: [req.user.id] // add current user
+            participants: [req.user.id], // add current user
+            creator: req.user.id 
         });
 
         const savedRoom = await newRoom.save();
@@ -41,6 +42,22 @@ router.post('/create', authenticateToken, async (req, res) => {
 
 module.exports = router;
 
+router.delete('/:roomId', authenticateToken, async (req, res) => {
+  try {
+    const room = await Room.findById(req.params.roomId);
+    if (!room) return res.status(404).json({ message: 'Room not found' });
+
+    if (room.creator.toString() !== req.user.id) {
+      return res.status(403).json({ message: 'Only the creator can delete this room' });
+    }
+
+    await room.deleteOne();
+    res.status(200).json({ message: 'Room deleted successfully' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
 
 
 // @route   POST /api/rooms/:roomId/join

@@ -1,0 +1,30 @@
+/* App.css */
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: Ancizar Serif, Ancizar Serif;
+}
+
+
+.section-title {
+  margin-top: 30px;
+  font-size: 1.5rem;
+}
+hr {
+  margin-bottom: 20px;
+}
+
+button {
+  background-color: #52916c;
+  color: white;
+  padding: 8px 16px;
+  margin-top: 8px;
+  border: none;
+  border-radius: 16px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #a5670b;
+}

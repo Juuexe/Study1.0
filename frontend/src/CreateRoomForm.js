@@ -1,5 +1,6 @@
 // src/CreateRoomForm.js
 import { useState } from 'react';
+//import './App.css';
 
 function CreateRoomForm({ token, onRoomCreated }) {
   const [roomName, setRoomName] = useState('');
@@ -41,7 +42,7 @@ function CreateRoomForm({ token, onRoomCreated }) {
         placeholder="Enter room name"
         required
       />
-      <button type="submit">Create Room</button>
+      <button  className="button" type="submit">Create Room</button>
     </form>
   );
 }

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-function RoomList({ refreshKey, onLogout, onEnterRoom }) {
+function RoomList({ refreshKey, onLogout, onEnterRoom, userId }) {
   const [rooms, setRooms] = useState([]);
   const [error, setError] = useState('');
   const [joinMessage, setJoinMessage] = useState('');
@@ -29,6 +29,27 @@ function RoomList({ refreshKey, onLogout, onEnterRoom }) {
 
     fetchRooms();
   }, [refreshKey]);
+
+
+  const handleDelete = async (roomId) => {
+  const token = localStorage.getItem('token');
+  try {
+    const res = await fetch(`https://study1-0.onrender.com/api/rooms/${roomId}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Failed to delete room');
+
+    setRooms(rooms.filter(room => room._id !== roomId)); // Remove from UI
+  } catch (err) {
+    console.error(err);
+    setError(err.message);
+  }
+};
 
   const handleJoin = async (roomId) => {
     const token = localStorage.getItem('token');
@@ -66,9 +87,12 @@ function RoomList({ refreshKey, onLogout, onEnterRoom }) {
           <li key={room._id}>
             <h3>{room.name}</h3>
             <p>{room.description}</p>
-            <small>Room ID: {room._id}</small><br />
-            <button onClick={() => handleJoin(room._id)}>Join Room</button>
-            <button onClick={() => onEnterRoom(room._id)}>Enter Room</button>
+
+            {room.creator === userId && (
+      <button onClick={() => handleDelete(room._id)}>Delete</button>
+        )}
+            <button   onClick={() => handleJoin(room._id)}>Join Room</button>
+            <button   onClick={() => onEnterRoom(room._id)}>Enter Room</button>
           </li>
         ))}
       </ul>

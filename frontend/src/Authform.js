@@ -1,5 +1,5 @@
 import { useState } from 'react'; //; lets you add state variables to functional components
-
+import './App.css';
 
 function Authform({ onLogin }) {                        //declare a functional component - AuthForm
   const [isLogin, setIsLogin] = useState(true); // creates a a state variable isLogin, with initial value true, and a function setIsLogin to update it
@@ -54,6 +54,7 @@ function Authform({ onLogin }) {                        //declare a functional c
 
   return (
     <div>
+      <h2 className="section-title">Welcome</h2>
       <h2>{isLogin ? 'Login' : 'Register'}</h2>         
       <form onSubmit={handleSubmit}>
         {!isLogin && (
@@ -87,7 +88,7 @@ function Authform({ onLogin }) {                        //declare a functional c
 
       <p style={{ color: 'green' }}>{message}</p>     
 
-      <button onClick={() => setIsLogin(!isLogin)}>       
+      <button   onClick={() => setIsLogin(!isLogin)}>       
         Switch to {isLogin ? 'Register' : 'Login'}
       </button>
     </div>
