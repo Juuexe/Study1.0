@@ -156,10 +156,51 @@ router.get('/:roomId/messages', authenticateToken, async (req, res) => {
     }
 });
 
+// @route   GET /api/rooms
+// @desc    Get all rooms with creator info
+// @access  Private
 router.get('/', authenticateToken, async (req, res) => {
   try {
-    const rooms = await Room.find();
+    const rooms = await Room.find()
+      .populate('creator', 'username email')
+      .populate('participants', 'username email');
     res.json(rooms);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// @route   GET /api/rooms/:roomId
+// @desc    Get specific room details
+// @access  Private
+router.get('/:roomId', authenticateToken, async (req, res) => {
+  try {
+    const room = await Room.findById(req.params.roomId)
+      .populate('creator', 'username email')
+      .populate('participants', 'username email');
+    
+    if (!room) {
+      return res.status(404).json({ message: 'Room not found' });
+    }
+
+    res.json(room);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// @route   DELETE /api/rooms/clear-all
+// @desc    Clear all rooms (admin function)
+// @access  Private
+router.delete('/clear-all', authenticateToken, async (req, res) => {
+  try {
+    const result = await Room.deleteMany({});
+    res.status(200).json({ 
+      message: `Successfully cleared ${result.deletedCount} rooms`,
+      deletedCount: result.deletedCount 
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Server error' });

@@ -1,1 +1,6 @@
 .env
+.env.production
+frontend/.env.production
+
+# Local Netlify folder
+.netlify
