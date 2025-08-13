@@ -36,12 +36,61 @@ app.listen(PORT, () => {
 }
 );
 
-// Connect to MongoDB
-mongoose.connect(process.env.MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-})
-.then(() => console.log('Connected to MongoDB'))
-.catch(err => console.error('MongoDB connection failed:', err));
+// Connect to MongoDB with improved error handling
+const connectDB = async () => {
+  try {
+    console.log('Attempting to connect to MongoDB...');
+    console.log('MongoDB URI:', process.env.MONGO_URI ? process.env.MONGO_URI.replace(/\/\/([^:]+):([^@]+)@/, '//$1:***@') : 'Not found');
+    
+    await mongoose.connect(process.env.MONGO_URI, {
+      serverSelectionTimeoutMS: 5000, // Timeout after 5s instead of 30s
+      socketTimeoutMS: 45000, // Close sockets after 45s of inactivity
+    });
+    
+    console.log('✅ Successfully connected to MongoDB');
+  } catch (err) {
+    console.error('❌ MongoDB connection failed:', err.message);
+    
+    if (err.message.includes('ECONNREFUSED')) {
+      console.log('💡 Suggestion: Make sure MongoDB is running locally on port 27017');
+      console.log('   - Install MongoDB: https://www.mongodb.com/try/download/community');
+      console.log('   - Or run with Docker: docker run --name mongodb -p 27017:27017 -d mongo:latest');
+    } else if (err.message.includes('bad auth')) {
+      console.log('💡 Suggestion: Check your MongoDB credentials in .env file');
+    } else if (err.message.includes('network')) {
+      console.log('💡 Suggestion: Check your network connection and MongoDB Atlas settings');
+    }
+    
+    console.log('⚠️  Server will continue running but database operations will fail');
+  }
+};
+
+// Handle MongoDB connection events
+mongoose.connection.on('connected', () => {
+  console.log('📡 Mongoose connected to MongoDB');
+});
+
+mongoose.connection.on('error', (err) => {
+  console.error('💥 MongoDB connection error:', err);
+});
+
+mongoose.connection.on('disconnected', () => {
+  console.log('📴 Mongoose disconnected from MongoDB');
+});
+
+// Graceful shutdown
+process.on('SIGINT', async () => {
+  try {
+    await mongoose.connection.close();
+    console.log('👋 MongoDB connection closed through app termination');
+    process.exit(0);
+  } catch (err) {
+    console.error('Error during graceful shutdown:', err);
+    process.exit(1);
+  }
+});
+
+// Connect to database
+connectDB();
 
 
