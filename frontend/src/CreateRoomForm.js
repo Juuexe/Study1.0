@@ -8,7 +8,8 @@ function CreateRoomForm({ token, onRoomCreated }) {
     e.preventDefault();
 
     try {
-      const response = await fetch('https://study1-0.onrender.com/api/rooms/create', {
+      const apiBase = process.env.REACT_APP_API_BASE || 'http://localhost:5000';
+      const response = await fetch(`${apiBase}/api/rooms/create`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

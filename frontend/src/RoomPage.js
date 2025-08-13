@@ -11,7 +11,8 @@ function RoomPage({ roomId, onBack }) {
   useEffect(() => {
     const fetchMessages = async () => {
       try {
-        const res = await fetch(`https://study1-0.onrender.com/api/rooms/${roomId}/messages`, {
+        const apiBase = process.env.REACT_APP_API_BASE || 'http://localhost:5000';
+        const res = await fetch(`${apiBase}/api/rooms/${roomId}/messages`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         const data = await res.json();
@@ -28,7 +29,8 @@ function RoomPage({ roomId, onBack }) {
   const handleSend = async () => {
     if (!newMessage.trim()) return;
     try {
-      const res = await fetch(`https://study1-0.onrender.com/api/rooms/${roomId}/message`, {
+      const apiBase = process.env.REACT_APP_API_BASE || 'http://localhost:5000';
+      const res = await fetch(`${apiBase}/api/rooms/${roomId}/message`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

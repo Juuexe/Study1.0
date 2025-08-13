@@ -12,9 +12,10 @@ function Authform({ onLogin }) {                        //declare a functional c
 
   const handleSubmit = async (e) => { // Declares an async function to handle form submission. async allows using await for API calls.
     e.preventDefault(); //  Prevents the default form submission behavior (page refresh).
+    const apiBase = process.env.REACT_APP_API_BASE || 'http://localhost:5000';
     const url = isLogin
-      ? 'https://study1-0.onrender.com/api/auth/login'    
-      : 'https://study1-0.onrender.com/api/auth/register';
+      ? `${apiBase}/api/auth/login`    
+      : `${apiBase}/api/auth/register`;
 
     const payload = isLogin //Creates the data to send to the server. Login only needs email/password, registration needs username too.
       ? { email: form.email, password: form.password }

@@ -9,7 +9,8 @@ function RoomList({ refreshKey, onLogout, onEnterRoom, userId }) {
     const fetchRooms = async () => {
       const token = localStorage.getItem('token');
       try {
-        const res = await fetch('https://study1-0.onrender.com/api/rooms', {
+        const apiBase = process.env.REACT_APP_API_BASE || 'http://localhost:5000';
+        const res = await fetch(`${apiBase}/api/rooms`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -34,7 +35,8 @@ function RoomList({ refreshKey, onLogout, onEnterRoom, userId }) {
   const handleDelete = async (roomId) => {
   const token = localStorage.getItem('token');
   try {
-    const res = await fetch(`https://study1-0.onrender.com/api/rooms/${roomId}`, {
+    const apiBase = process.env.REACT_APP_API_BASE || 'http://localhost:5000';
+    const res = await fetch(`${apiBase}/api/rooms/${roomId}`, {
       method: 'DELETE',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -54,7 +56,8 @@ function RoomList({ refreshKey, onLogout, onEnterRoom, userId }) {
   const handleJoin = async (roomId) => {
     const token = localStorage.getItem('token');
     try {
-      const res = await fetch(`https://study1-0.onrender.com/api/rooms/${roomId}/join`, {
+      const apiBase = process.env.REACT_APP_API_BASE || 'http://localhost:5000';
+      const res = await fetch(`${apiBase}/api/rooms/${roomId}/join`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
