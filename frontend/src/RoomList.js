@@ -4,6 +4,7 @@ function RoomList({ refreshKey, onLogout, onEnterRoom, userId }) {
   const [rooms, setRooms] = useState([]);
   const [error, setError] = useState('');
   const [joinMessage, setJoinMessage] = useState('');
+  const [clearingRooms, setClearingRooms] = useState(false);
 
   useEffect(() => {
     const fetchRooms = async () => {
@@ -79,6 +80,35 @@ function RoomList({ refreshKey, onLogout, onEnterRoom, userId }) {
     }
   };
 
+  const handleClearAllRooms = async () => {
+    if (!window.confirm('⚠️ Are you sure you want to delete ALL rooms? This action cannot be undone!')) {
+      return;
+    }
+
+    setClearingRooms(true);
+    const token = localStorage.getItem('token');
+    try {
+      const apiBase = process.env.REACT_APP_API_BASE || 'http://localhost:5000';
+      const res = await fetch(`${apiBase}/api/rooms/clear-all`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Failed to clear rooms');
+
+      setRooms([]); // Clear all rooms from UI
+      setJoinMessage(`✅ ${data.message}`);
+    } catch (err) {
+      console.error(err);
+      setError(err.message);
+    } finally {
+      setClearingRooms(false);
+    }
+  };
+
   return (
     <div>
       <div className="flex justify-between items-center mb-4">
@@ -101,6 +131,20 @@ function RoomList({ refreshKey, onLogout, onEnterRoom, userId }) {
           <p className="card-subtitle">No study rooms available yet. Create the first one!</p>
         </div>
       ) : (
+        <>
+          {rooms.length > 0 && (
+            <div className="flex justify-between items-center mb-3">
+              <span className="text-sm text-muted">{rooms.length} room{rooms.length > 1 ? 's' : ''} available</span>
+              <button 
+                onClick={handleClearAllRooms}
+                disabled={clearingRooms}
+                className="btn btn-danger btn-small"
+                style={{ fontSize: '0.8rem' }}
+              >
+                {clearingRooms ? '🗑️ Clearing...' : '🗑️ Clear All Rooms'}
+              </button>
+            </div>
+          )}
         <div className="rooms-grid">
           {rooms.map((room) => (
             <div key={room._id} className="card room-card">
@@ -139,6 +183,7 @@ function RoomList({ refreshKey, onLogout, onEnterRoom, userId }) {
             </div>
           ))}
         </div>
+        </>
       )}
     </div>
   );

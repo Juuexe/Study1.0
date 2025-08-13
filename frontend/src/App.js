@@ -27,7 +27,7 @@ function App() {
           setUserId(null);
         } else {
           setIsLoggedIn(true);
-          setUserId(decoded.userId);
+          setUserId(decoded.id); // JWT tokens use 'id' field
         }
       } catch (err) {
         console.error('Invalid token:', err);
