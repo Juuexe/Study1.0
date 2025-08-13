@@ -313,16 +313,68 @@
   padding: 0.75rem;
   border-radius: 8px;
   background: var(--background);
+  position: relative;
+  transition: background-color 0.2s ease;
+}
+
+.message:hover {
+  background: #f1f5f9;
+}
+
+.message-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
 }
 
 .message-sender {
   font-weight: 600;
   color: var(--primary-color);
-  margin-bottom: 0.25rem;
+  font-size: 0.875rem;
+}
+
+.message-time {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  font-weight: 400;
+}
+
+.edited-indicator {
+  font-style: italic;
+  opacity: 0.8;
+}
+
+.message-delete-btn {
+  background: var(--danger-color);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  width: 24px;
+  height: 24px;
+  font-size: 14px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.message:hover .message-delete-btn {
+  opacity: 1;
+}
+
+.message-delete-btn:hover {
+  background: #dc2626;
+  transform: scale(1.1);
 }
 
 .message-content {
   color: var(--text-primary);
+  line-height: 1.4;
+  word-wrap: break-word;
 }
 
 .chat-input {
