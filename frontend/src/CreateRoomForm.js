@@ -1,6 +1,5 @@
-// src/CreateRoomForm.js
 import { useState } from 'react';
-//import './App.css';
+import './App.css';
 
 function CreateRoomForm({ token, onRoomCreated }) {
   const [roomName, setRoomName] = useState('');
@@ -35,14 +34,20 @@ function CreateRoomForm({ token, onRoomCreated }) {
 
   return (
     <form onSubmit={handleSubmit}>
-      <input
-        type="text"
-        value={roomName}
-        onChange={(e) => setRoomName(e.target.value)}
-        placeholder="Enter room name"
-        required
-      />
-      <button  className="button" type="submit">Create Room</button>
+      <div className="form-group">
+        <label className="form-label">Room Name</label>
+        <input
+          type="text"
+          className="form-input"
+          value={roomName}
+          onChange={(e) => setRoomName(e.target.value)}
+          placeholder="e.g., Math Study Group, CS 101 Review"
+          required
+        />
+      </div>
+      <button className="btn btn-success" type="submit" style={{ width: '100%' }}>
+        Create Room
+      </button>
     </form>
   );
 }

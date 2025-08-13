@@ -4,7 +4,7 @@ import RoomList from './RoomList';
 import CreateRoomForm from './CreateRoomForm';
 import RoomPage from './RoomPage';
 import { jwtDecode } from 'jwt-decode';
-//import './App.css';
+import './App.css';
 
 
 function App() {
@@ -45,8 +45,13 @@ function App() {
 
   
   return (
-    <div className = "container">
-      <h1>Study Group App</h1>
+    <div className="container">
+      {!isLoggedIn && (
+        <header className="app-header">
+          <h1 className="app-title">StudyHub</h1>
+          <p className="app-subtitle">Collaborate, Learn, Succeed Together</p>
+        </header>
+      )}
 
       {isLoggedIn ? (
         currentRoomId ? (
@@ -55,24 +60,36 @@ function App() {
             onBack={() => setCurrentRoomId(null)} 
           />
         ) : (
-          <>
-            <CreateRoomForm
-              token={localStorage.getItem('token')}
-              onRoomCreated={() => setRoomsUpdated((prev) => !prev)}
-            />
+          <div className="section">
+            <h2 className="section-title">Your Study Rooms</h2>
+            <p className="section-subtitle">Create a new room or join an existing one to start studying</p>
+            
+            <div className="card">
+              <div className="card-header">
+                <h3 className="card-title">Create New Room</h3>
+                <p className="card-subtitle">Start a new study session</p>
+              </div>
+              <CreateRoomForm
+                token={localStorage.getItem('token')}
+                onRoomCreated={() => setRoomsUpdated((prev) => !prev)}
+              />
+            </div>
+            
             <RoomList
-             refreshKey={roomsUpdated}
-             onLogout={handleLogout}
-             onEnterRoom={(roomId) => setCurrentRoomId(roomId)} 
-             userId={userId}
+              refreshKey={roomsUpdated}
+              onLogout={handleLogout}
+              onEnterRoom={(roomId) => setCurrentRoomId(roomId)} 
+              userId={userId}
             />
-          </>
+          </div>
         )
       ) : (
-        <AuthForm onLogin={() => {
-          setIsLoggedIn(true);
-          setRoomsUpdated((prev) => !prev);
-        }} />
+        <div className="section">
+          <AuthForm onLogin={() => {
+            setIsLoggedIn(true);
+            setRoomsUpdated((prev) => !prev);
+          }} />
+        </div>
       )}
     </div>
   );

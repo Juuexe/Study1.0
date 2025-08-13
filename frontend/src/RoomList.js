@@ -78,24 +78,65 @@ function RoomList({ refreshKey, onLogout, onEnterRoom, userId }) {
 
   return (
     <div>
-       <button onClick={onLogout} style={{ float: 'right' }}>Logout</button>
-      <h2>Available Study Rooms</h2>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      {joinMessage && <p style={{ color: 'blue' }}>{joinMessage}</p>}
-      <ul>
-        {rooms.map((room) => (
-          <li key={room._id}>
-            <h3>{room.name}</h3>
-            <p>{room.description}</p>
-
-            {room.creator === userId && (
-      <button onClick={() => handleDelete(room._id)}>Delete</button>
-        )}
-            <button   onClick={() => handleJoin(room._id)}>Join Room</button>
-            <button   onClick={() => onEnterRoom(room._id)}>Enter Room</button>
-          </li>
-        ))}
-      </ul>
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="section-title" style={{ margin: 0 }}>Available Study Rooms</h2>
+        <button onClick={onLogout} className="btn btn-secondary btn-small">
+          Logout
+        </button>
+      </div>
+      
+      {error && (
+        <div className="alert alert-error">{error}</div>
+      )}
+      
+      {joinMessage && (
+        <div className="alert alert-info">{joinMessage}</div>
+      )}
+      
+      {rooms.length === 0 ? (
+        <div className="card text-center">
+          <p className="card-subtitle">No study rooms available yet. Create the first one!</p>
+        </div>
+      ) : (
+        <div className="rooms-grid">
+          {rooms.map((room) => (
+            <div key={room._id} className="card room-card">
+              <div className="card-header">
+                <h3 className="card-title">{room.name}</h3>
+                {room.description && (
+                  <p className="card-subtitle">{room.description}</p>
+                )}
+              </div>
+              
+              <div className="room-actions">
+                <div className="flex" style={{ gap: '0.5rem' }}>
+                  <button 
+                    onClick={() => handleJoin(room._id)}
+                    className="btn btn-outline btn-small"
+                  >
+                    Join
+                  </button>
+                  <button 
+                    onClick={() => onEnterRoom(room._id)}
+                    className="btn btn-small" 
+                    style={{ flex: 1 }}
+                  >
+                    Enter Room
+                  </button>
+                  {room.creator === userId && (
+                    <button 
+                      onClick={() => handleDelete(room._id)}
+                      className="btn btn-danger btn-small"
+                    >
+                      Delete
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

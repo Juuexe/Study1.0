@@ -1,4 +1,4 @@
-import { useState } from 'react'; //; lets you add state variables to functional components
+import { useState } from 'react';
 import './App.css';
 
 function Authform({ onLogin }) {                        //declare a functional component - AuthForm
@@ -53,44 +53,80 @@ function Authform({ onLogin }) {                        //declare a functional c
 //
 
   return (
-    <div>
-      <h2 className="section-title">Welcome</h2>
-      <h2>{isLogin ? 'Login' : 'Register'}</h2>         
+    <div className="card" style={{ maxWidth: '400px', margin: '0 auto' }}>
+      <div className="card-header text-center">
+        <h2 className="card-title">{isLogin ? 'Welcome Back' : 'Join StudyHub'}</h2>
+        <p className="card-subtitle">
+          {isLogin ? 'Sign in to your account' : 'Create your account to get started'}
+        </p>
+      </div>
+      
       <form onSubmit={handleSubmit}>
         {!isLogin && (
-          <input
-            type="text"
-            name="username"
-            placeholder="Username"
-            value={form.username}
-            onChange={handleChange}
-          />
+          <div className="form-group">
+            <label className="form-label">Username</label>
+            <input
+              type="text"
+              name="username"
+              className="form-input"
+              placeholder="Choose a username"
+              value={form.username}
+              onChange={handleChange}
+              required
+            />
+          </div>
         )}
-        <br />            
-        <input
-          type="email"
-          name="email"
-          placeholder="Email"
-          value={form.email}
-          onChange={handleChange}  
-        />
-        <br />
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          value={form.password}
-          onChange={handleChange}
-        />
-        <br />
-        <button type="submit">{isLogin ? 'Login' : 'Register'}</button>
+        
+        <div className="form-group">
+          <label className="form-label">Email</label>
+          <input
+            type="email"
+            name="email"
+            className="form-input"
+            placeholder="Enter your email"
+            value={form.email}
+            onChange={handleChange}
+            required
+          />
+        </div>
+        
+        <div className="form-group">
+          <label className="form-label">Password</label>
+          <input
+            type="password"
+            name="password"
+            className="form-input"
+            placeholder="Enter your password"
+            value={form.password}
+            onChange={handleChange}
+            required
+          />
+        </div>
+        
+        <button type="submit" className="btn btn-large" style={{ width: '100%' }}>
+          {isLogin ? 'Sign In' : 'Create Account'}
+        </button>
       </form>
 
-      <p style={{ color: 'green' }}>{message}</p>     
+      {message && (
+        <div className={`alert ${message.includes('Error') || message.includes('wrong') ? 'alert-error' : 'alert-success'}`}>
+          {message}
+        </div>
+      )}
 
-      <button   onClick={() => setIsLogin(!isLogin)}>       
-        Switch to {isLogin ? 'Register' : 'Login'}
-      </button>
+      <div className="text-center mt-4">
+        <p className="card-subtitle">
+          {isLogin ? "Don't have an account?" : 'Already have an account?'}
+        </p>
+        <button 
+          type="button"
+          className="btn btn-outline" 
+          onClick={() => setIsLogin(!isLogin)}
+          style={{ width: '100%' }}
+        >
+          {isLogin ? 'Create Account' : 'Sign In'}
+        </button>
+      </div>
     </div>
   );
 }
