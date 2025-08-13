@@ -1,0 +1,14 @@
+[build]
+  publish = "build"
+  command = "npm run build"
+
+[build.environment]
+  NODE_VERSION = "18"
+  # Uncomment the line below if you encounter memory issues during build
+  # NETLIFY_USE_YARN = "true"
+
+# Optional: Add redirect rules for React Router
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
