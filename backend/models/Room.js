@@ -4,7 +4,8 @@ const mongoose = require('mongoose');
 const MessageSchema = new mongoose.Schema({
     sender: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }, // Reference to sender
     content: { type: String, required: true }, // Text of the message
-    timestamp: { type: Date, default: Date.now } // Auto-assign current time
+    timestamp: { type: Date, default: Date.now }, // Auto-assign current time
+    editedAt: { type: Date } // Track when message was last edited
 });
 
 // Define the Room schema
