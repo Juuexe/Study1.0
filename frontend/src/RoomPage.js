@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import './App.css';
 
 function RoomPage({ roomId, onBack }) {
+  console.log(' RoomPage rendered with roomId:', roomId);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [error, setError] = useState('');
@@ -13,6 +14,14 @@ function RoomPage({ roomId, onBack }) {
   const messagesEndRef = useRef(null);
 
   const token = localStorage.getItem('token');
+   console.log('🔑 Token exists:', !!token);
+   console.log('🎯 Current state:', { 
+    loading, 
+    needsToJoin, 
+    error, 
+    messagesLength: messages.length,
+    hasRoomInfo: !!roomInfo 
+    });
   
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -37,6 +46,7 @@ function RoomPage({ roomId, onBack }) {
   };
 
   const fetchMessages = async () => {
+     console.log(' fetchMessages called for roomId:', roomId);
     setLoading(true);
     console.log('Fetching messages for room:', roomId);
     try {

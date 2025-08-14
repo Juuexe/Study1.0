@@ -37,6 +37,7 @@ function Authform({ onLogin }) {                        //declare a functional c
       //If successful, handles login by saving the authentication token to browser storage and showing success message
       if (isLogin) {
         localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
         setMessage('Logged in! ');
         onLogin();
       } else {
