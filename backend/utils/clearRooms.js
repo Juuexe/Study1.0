@@ -5,12 +5,10 @@ require('dotenv').config();
 const clearAllRooms = async () => {
     try {
         // Connect to MongoDB
-        await mongoose.connect(process.env.MONGO_URI, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-        });
+        console.log('Attempting to connect to MongoDB...');
+        await mongoose.connect(process.env.MONGO_URI);
         
-        console.log('Connected to MongoDB');
+        console.log('✅ Connected to MongoDB');
 
         // Delete all rooms
         const result = await Room.deleteMany({});

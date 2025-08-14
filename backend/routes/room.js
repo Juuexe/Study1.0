@@ -287,11 +287,22 @@ router.get('/:roomId', authenticateToken, async (req, res) => {
 });
 
 // @route   DELETE /api/rooms/clear-all
-// @desc    Clear all rooms (admin function)
+// @desc    Clear all rooms (admin function) - requires confirmation
 // @access  Private
 router.delete('/clear-all', authenticateToken, async (req, res) => {
   try {
+    // Require confirmation to prevent accidental deletions
+    const { confirm } = req.body;
+    if (confirm !== 'DELETE_ALL_ROOMS') {
+      return res.status(400).json({ 
+        message: 'Confirmation required. Send { "confirm": "DELETE_ALL_ROOMS" } in request body to proceed.',
+        warning: 'This action will permanently delete ALL rooms and cannot be undone.'
+      });
+    }
+    
     const result = await Room.deleteMany({});
+    console.log(`🧹 User ${req.user.id} cleared ${result.deletedCount} rooms`);
+    
     res.status(200).json({ 
       message: `Successfully cleared ${result.deletedCount} rooms`,
       deletedCount: result.deletedCount 
