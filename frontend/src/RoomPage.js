@@ -46,7 +46,14 @@ function RoomPage({ roomId, onBack }) {
   };
 
   const fetchMessages = async () => {
-     console.log(' fetchMessages called for roomId:', roomId);
+      console.log('🔍 API Response:', { 
+      status: res.status, 
+      dataType: typeof data,
+      isArray: Array.isArray(data),
+      data: data 
+    });
+
+    console.log(' fetchMessages called for roomId:', roomId);
     setLoading(true);
     console.log('Fetching messages for room:', roomId);
     try {
@@ -76,16 +83,20 @@ function RoomPage({ roomId, onBack }) {
       setNeedsToJoin(false);
       
       // Handle both old format (direct array) and new format (with pagination)
-      if (Array.isArray(data)) {
-        // Old format - direct message array
-        setMessages(data);
-        console.log('Set messages (old format):', data.length, 'messages');
-      } else {
-        // New format - paginated response
-        setMessages(data.messages || []);
-        setPagination(data.pagination);
-        console.log('Set messages (new format):', data.messages?.length || 0, 'messages');
-      }
+     if (Array.isArray(data)) {
+      // Old format - direct message array
+      console.log('📋 Setting messages (old format):', data.length, 'messages');
+      setMessages(data);
+    } else if (data && Array.isArray(data.messages)) {
+      // New format - paginated response
+      console.log('📋 Setting messages (new format):', data.messages.length, 'messages');
+      setMessages(data.messages);
+      setPagination(data.pagination);
+    } else {
+      // Unexpected format - log it and set empty array
+      console.error('❌ Unexpected API response format:', data);
+      setMessages([]); // Fallback to empty array
+    }
       
       setError(''); // Clear any previous errors
     } catch (err) {
@@ -277,7 +288,7 @@ function RoomPage({ roomId, onBack }) {
                   <p className="card-subtitle">No messages yet. Start the conversation!</p>
                 </div>
               ) : (
-                messages.map((msg) => (
+                 Array.isArray(messages) && messages.map((msg) => (
                   <div key={msg._id || msg.timestamp} className="message">
                     <div className="message-header">
                       <span className="message-sender">
