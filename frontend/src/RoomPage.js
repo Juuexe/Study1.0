@@ -8,6 +8,8 @@ function RoomPage({ roomId, onBack }) {
   const [pagination, setPagination] = useState(null);
   const [loading, setLoading] = useState(false);
   const [roomInfo, setRoomInfo] = useState(null);
+  const [needsToJoin, setNeedsToJoin] = useState(false);
+  const [joining, setJoining] = useState(false);
   const messagesEndRef = useRef(null);
 
   const token = localStorage.getItem('token');
@@ -42,7 +44,19 @@ function RoomPage({ roomId, onBack }) {
         headers: { Authorization: `Bearer ${token}` }
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.message || 'Failed to load messages');
+      
+      if (!res.ok) {
+        // If user must join first, show join button
+        if (data.message && data.message.includes('join the room first')) {
+          setNeedsToJoin(true);
+          setError('');
+        } else {
+          throw new Error(data.message || 'Failed to load messages');
+        }
+        return;
+      }
+      
+      setNeedsToJoin(false);
       
       // Handle both old format (direct array) and new format (with pagination)
       if (Array.isArray(data)) {
@@ -127,6 +141,32 @@ function RoomPage({ roomId, onBack }) {
     }
   };
 
+  const handleJoinRoom = async () => {
+    setJoining(true);
+    try {
+      const apiBase = process.env.REACT_APP_API_BASE || 'http://localhost:5000';
+      const res = await fetch(`${apiBase}/api/rooms/${roomId}/join`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Failed to join room');
+
+      // After successful join, fetch messages and room info
+      setNeedsToJoin(false);
+      await fetchMessages();
+      await fetchRoomInfo();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setJoining(false);
+    }
+  };
+
   return (
     <div className="section">
       <div className="flex justify-between items-center mb-4">
@@ -145,64 +185,88 @@ function RoomPage({ roomId, onBack }) {
           <div className="alert alert-error">{error}</div>
         )}
         
-        <div className="chat-container">
-          <div className="messages-list">
-            {loading && (
-              <div className="text-center">
-                <p className="card-subtitle">Loading messages...</p>
-              </div>
-            )}
-            {messages.length === 0 && !loading ? (
-              <div className="text-center">
-                <p className="card-subtitle">No messages yet. Start the conversation!</p>
-              </div>
-            ) : (
-              messages.map((msg) => (
-                <div key={msg._id || msg.timestamp} className="message">
-                  <div className="message-header">
-                    <span className="message-sender">
-                      {msg.sender?.username || 'Unknown'}
-                    </span>
-                    <span className="message-time">
-                      {formatTime(msg.timestamp)}
-                      {msg.editedAt && <span className="edited-indicator"> (edited)</span>}
-                    </span>
-                    {isUserMessage(msg) && (
-                      <button 
-                        className="message-delete-btn"
-                        onClick={() => handleDeleteMessage(msg._id)}
-                        title="Delete message"
-                      >
-                        ×
-                      </button>
-                    )}
-                  </div>
-                  <div className="message-content">{msg.content}</div>
+        {needsToJoin ? (
+          <div className="text-center" style={{ padding: '2rem' }}>
+            <div className="alert alert-info">
+              <h3>Join this room to participate</h3>
+              <p>You need to join this room before you can see messages and chat.</p>
+              {roomInfo && (
+                <div style={{ marginTop: '1rem' }}>
+                  <p><strong>Room:</strong> {roomInfo.name}</p>
+                  {roomInfo.description && <p><strong>Description:</strong> {roomInfo.description}</p>}
+                  <p><strong>Participants:</strong> {roomInfo.participants.length}</p>
                 </div>
-              ))
-            )}
-            <div ref={messagesEndRef} />
+              )}
+              <button 
+                onClick={handleJoinRoom}
+                disabled={joining}
+                className="btn btn-primary"
+                style={{ marginTop: '1rem' }}
+              >
+                {joining ? 'Joining...' : 'Join Room'}
+              </button>
+            </div>
           </div>
-          
-          <div className="chat-input">
-            <input
-              type="text"
-              className="form-input"
-              placeholder="Type your message..."
-              value={newMessage}
-              onChange={e => setNewMessage(e.target.value)}
-              onKeyPress={handleKeyPress}
-              style={{ margin: 0 }}
-            />
-            <button 
-              onClick={handleSend} 
-              className="btn btn-success"
-              disabled={!newMessage.trim()}
-            >
-              Send
-            </button>
+        ) : (
+          <div className="chat-container">
+            <div className="messages-list">
+              {loading && (
+                <div className="text-center">
+                  <p className="card-subtitle">Loading messages...</p>
+                </div>
+              )}
+              {messages.length === 0 && !loading ? (
+                <div className="text-center">
+                  <p className="card-subtitle">No messages yet. Start the conversation!</p>
+                </div>
+              ) : (
+                messages.map((msg) => (
+                  <div key={msg._id || msg.timestamp} className="message">
+                    <div className="message-header">
+                      <span className="message-sender">
+                        {msg.sender?.username || 'Unknown'}
+                      </span>
+                      <span className="message-time">
+                        {formatTime(msg.timestamp)}
+                        {msg.editedAt && <span className="edited-indicator"> (edited)</span>}
+                      </span>
+                      {isUserMessage(msg) && (
+                        <button 
+                          className="message-delete-btn"
+                          onClick={() => handleDeleteMessage(msg._id)}
+                          title="Delete message"
+                        >
+                          ×
+                        </button>
+                      )}
+                    </div>
+                    <div className="message-content">{msg.content}</div>
+                  </div>
+                ))
+              )}
+              <div ref={messagesEndRef} />
+            </div>
+            
+            <div className="chat-input">
+              <input
+                type="text"
+                className="form-input"
+                placeholder="Type your message..."
+                value={newMessage}
+                onChange={e => setNewMessage(e.target.value)}
+                onKeyPress={handleKeyPress}
+                style={{ margin: 0 }}
+              />
+              <button 
+                onClick={handleSend} 
+                className="btn btn-success"
+                disabled={!newMessage.trim()}
+              >
+                Send
+              </button>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

@@ -92,8 +92,10 @@ function RoomList({ refreshKey, onLogout, onEnterRoom, userId }) {
       const res = await fetch(`${apiBase}/api/rooms/clear-all`, {
         method: 'DELETE',
         headers: {
+          'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
+        body: JSON.stringify({ confirm: 'DELETE_ALL_ROOMS' }),
       });
 
       const data = await res.json();
@@ -170,7 +172,7 @@ function RoomList({ refreshKey, onLogout, onEnterRoom, userId }) {
                   >
                     Enter Room
                   </button>
-                  {room.creator === userId && (
+                  {(room.creator._id === userId || room.creator === userId) && (
                     <button 
                       onClick={() => handleDelete(room._id)}
                       className="btn btn-danger btn-small"
