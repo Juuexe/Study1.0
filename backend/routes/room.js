@@ -110,16 +110,27 @@ router.delete('/:roomId', authenticateToken, async (req, res) => {
 router.post('/:roomId/join', authenticateToken, async (req, res) => {
     try {
         const { roomId } = req.params;
+        console.log(`User ${req.user.id} attempting to join room ${roomId}`);
+
+        // Validate roomId format
+        if (!roomId || roomId.length !== 24) {
+            console.log(`Invalid room ID format: ${roomId}`);
+            return res.status(400).json({ message: 'Invalid room ID format' });
+        }
 
         // Find the room by its ID
         const room = await Room.findById(roomId);
         if (!room) {
+            console.log(`Room not found: ${roomId}`);
             return res.status(404).json({ message: 'Room not found' });
         }
+
+        console.log(`Room found: ${room.name}, current participants: ${room.participants.length}`);
 
         // Check if the user is already in the room
         const alreadyInRoom = room.participants.includes(req.user.id);
         if (alreadyInRoom) {
+            console.log(`User ${req.user.id} already in room ${roomId}`);
             return res.status(400).json({ message: 'You already joined this room' });
         }
 
@@ -127,10 +138,21 @@ router.post('/:roomId/join', authenticateToken, async (req, res) => {
         room.participants.push(req.user.id);
         await room.save();
 
-        res.status(200).json({ message: 'You joined the room!' });
+        console.log(`User ${req.user.id} successfully joined room ${roomId}`);
+        res.status(200).json({ 
+            message: 'You joined the room!',
+            room: {
+                id: room._id,
+                name: room.name,
+                participantCount: room.participants.length
+            }
+        });
     } catch (err) {
-        console.error(err);
-        res.status(500).json({ message: 'Server error' });
+        console.error('Room join error:', err);
+        if (err.name === 'CastError') {
+            return res.status(400).json({ message: 'Invalid room ID format' });
+        }
+        res.status(500).json({ message: 'Server error while joining room' });
     }
 });
 
