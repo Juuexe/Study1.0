@@ -38,6 +38,7 @@ function RoomPage({ roomId, onBack }) {
 
   const fetchMessages = async () => {
     setLoading(true);
+    console.log('Fetching messages for room:', roomId);
     try {
       const apiBase = process.env.REACT_APP_API_BASE || 'http://localhost:5000';
       const res = await fetch(`${apiBase}/api/rooms/${roomId}/messages?limit=50&page=1`, {
@@ -45,40 +46,54 @@ function RoomPage({ roomId, onBack }) {
       });
       const data = await res.json();
       
+      console.log('Messages response:', { status: res.status, data });
+      
       if (!res.ok) {
         // If user must join first, show join button
         if (data.message && data.message.includes('join the room first')) {
+          console.log('User needs to join room');
           setNeedsToJoin(true);
           setError('');
+          setMessages([]); // Clear any existing messages
         } else {
-          throw new Error(data.message || 'Failed to load messages');
+          console.error('Messages fetch error:', data.message);
+          setError(data.message || 'Failed to load messages');
         }
         return;
       }
       
+      console.log('User has access to room, setting needsToJoin to false');
       setNeedsToJoin(false);
       
       // Handle both old format (direct array) and new format (with pagination)
       if (Array.isArray(data)) {
         // Old format - direct message array
         setMessages(data);
+        console.log('Set messages (old format):', data.length, 'messages');
       } else {
         // New format - paginated response
         setMessages(data.messages || []);
         setPagination(data.pagination);
+        console.log('Set messages (new format):', data.messages?.length || 0, 'messages');
       }
       
       setError(''); // Clear any previous errors
     } catch (err) {
+      console.error('Fetch messages error:', err);
       setError(err.message);
+      setNeedsToJoin(false); // Don't show join button for network errors
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchMessages();
-    fetchRoomInfo();
+    console.log('RoomPage mounted or roomId changed:', roomId);
+    if (roomId) {
+      setLoading(true);
+      fetchMessages();
+      fetchRoomInfo();
+    }
   }, [roomId]);
   
   const handleDeleteMessage = async (messageId) => {
@@ -167,6 +182,37 @@ function RoomPage({ roomId, onBack }) {
     }
   };
 
+  console.log('Render state:', { 
+    loading, 
+    needsToJoin, 
+    hasError: !!error, 
+    messagesCount: messages.length, 
+    roomInfo: !!roomInfo 
+  });
+
+  // Ensure we never render a white screen
+  if (loading && !needsToJoin && messages.length === 0 && !error) {
+    console.log('Showing loading state');
+    return (
+      <div className="section">
+        <div className="flex justify-between items-center mb-4">
+          <button onClick={onBack} className="btn btn-outline">
+            ← Back to Room List
+          </button>
+        </div>
+        <div className="card">
+          <div className="card-header">
+            <h2 className="card-title">Study Room Chat</h2>
+            <p className="card-subtitle">Room ID: {roomId}</p>
+          </div>
+          <div className="text-center" style={{ padding: '2rem' }}>
+            <p className="card-subtitle">Loading room...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="section">
       <div className="flex justify-between items-center mb-4">
@@ -179,6 +225,7 @@ function RoomPage({ roomId, onBack }) {
         <div className="card-header">
           <h2 className="card-title">Study Room Chat</h2>
           <p className="card-subtitle">Room ID: {roomId}</p>
+          {roomInfo && <p className="card-subtitle">Room: {roomInfo.name}</p>}
         </div>
         
         {error && (
